@@ -1,0 +1,17 @@
+# model transformation
+T_C_CH:
+- [ 0.0, 0.0, 1.0, 0.0]
+- [-1.0, 0.0, 0.0, 0.0]
+- [ 0.0,-1.0, 0.0, 0.0]
+- [ 0.0, 0.0, 0.0, 1.0]
+invert_T_C_CH: true
+
+# lidar intrinsics
+sensor_is_lidar: false
+width: 1200
+height: 680  
+fx: 600.0
+fy: 600.0
+vx: 599.5
+vy: 339.5
+smooth_thre_ratio: 0.05

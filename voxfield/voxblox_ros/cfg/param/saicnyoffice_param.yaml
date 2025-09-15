@@ -1,0 +1,103 @@
+# Map 
+voxel_size: &voxel_size 0.1 # Voxel size in m
+voxels_per_side_in_block: &voxels_per_side_in_block 8 # Voxels per side of an allocated block. Must be a power of 2
+
+occ_voxel_size: *voxel_size
+occ_voxels_per_side: *voxels_per_side_in_block
+
+tsdf_voxel_size: *voxel_size
+tsdf_voxels_per_side: *voxels_per_side_in_block
+
+esdf_voxel_size: *voxel_size
+esdf_voxels_per_side: *voxels_per_side_in_block
+
+truncation_distance: -2.0 # The truncation distance for the TSDF (if negative, it means the multiplier of the voxel size) - \tau in the VoxField paper
+
+# TSDF integration
+# 1) "simple"
+#   The most straightfoward integrator. Every point in the pointcloud has a ray cast from the origin through it. 
+#   Every voxel each ray passes through is updated individually. A very slow and exact approach.
+# 2) "merged"
+#   Rays that start and finish in the same voxel are bundled into a single ray. 
+#   The properties of the points are merged and their weights added so no information is lost. 
+#   The approximation means some voxels will recive updates that were otherwise meant for neighboring voxels. 
+#   This approach works well with large voxels (10 cm or greater) and can give an order of magnitude speed up over the simple integrator.
+# 3) "fast"
+#   Rays that attempt to update voxels already updated by other rays from the same pointcloud are terminated early and discarded.
+#   An approximate method that has been designed to give the fastest possible results at the expense of discarding large quantities of information. 
+#   The trade off between speed and information loss can be tuned via the start_voxel_subsampling_factor and max_consecutive_ray_collisions parameters. 
+#   This method is currently the only viable integrator for real-time applications with voxels smaller than 5 cm.
+method: fast # select from simple, fast and merged
+merge_with_clear: true
+max_ray_length_m: 3.0 # The maximum range out to which a ray will be cast
+min_ray_length_m: 0.1 # The minimum range out to which a ray will be cast
+integration_threads: 30 # Threads for TSDF integration
+normal_available: true # TSDF updates based on normal values
+use_const_weight: false # Use constant weight of 1.0 for TSDF update for each voxel (see Eq. (2) in the VoxField paper)
+use_weight_dropoff: true # Use weight dropoff or not (see Eq. (2) in the VoxField paper) - if set to 'true', weight dropoff is handled by weight_dropoff_epsilon
+weight_reduction_exp: 1.0 # Sensor weight reduction exponent (1.0 for LIDAR, 2.0 for RGB-D)
+curve_assumption: true # Assuming only flat surfaces if set to 'false'
+reliable_band_ratio: 2.0 # Reliable band around obstacle surface for normal updates, as a multiplier of truncation_distance
+reliable_normal_ratio_thre: 0.05 # Inner product threshold for ruling out large incidence angles
+
+
+# ESDF integration
+local_range_offset_x: 20 # Number of voxels to append in x when expanding the current range
+local_range_offset_y: 20 # Number of voxels to append in y when expanding the current range
+local_range_offset_z: 0 # Number of voxels to append in z when expanding the current range
+esdf_default_distance_m: 2.0 # Maximum distance to calculate the actual distance to (Any values above this will be set to default_distance_m)
+max_behind_surface_m: 0.2 # Trunction distance behind surface (should be larger than truncation_distance)
+num_buckets: 50 # Number of buckets for the bucketed priority queue.
+# About the patch_on and early_break settings:
+#   Fastest operation can be achieved by setting patch_on=false and
+#   early_break =true. Highest accuracy can be achieved with patch_on=true
+#   and early_break= false. Please set them in the config file wisely. Turn
+#   on the patch code or not
+patch_on: true # Turn on the patch code (Algorithm 3 in FIESTA) or not
+early_break: true # Early break the increasing update or not
+# 1) If the voxel lies in the fixed band, then default value is its tsdf
+# 2) If out, apply the finer esdf correction, add the sub-voxel part of the esdf from the voxel center to the actual surface
+finer_esdf_on: true
+eval_esdf_on: false # Evaluate ESDF accuracy per eval_esdf_every_n_sec second
+
+# Occupancy grid integration
+occ_voxel_size_ratio: 0.865 # When judging a voxel as occupied or not, the threshold of TSDF distance is occ_voxel_size_ratio * voxel size
+occ_min_weight: 0.0001 # Minimum weight to consider a TSDF value seen at.
+probability_hit: 0.7 # Probability threshold above which cell is considered occupied
+probability_miss: 0.4 # Probability threshold below which cell is considered free
+threshold_min: 0.12 # Min threshold for log-odds updates
+threshold_max: 0.97 # Max threshold for log-odds updates
+threshold_occupancy: 0.7 # NOT USED
+
+# State estimation 
+enable_icp: false
+icp_iterations: 10
+use_tf_transforms: true
+world_frame: map
+sensor_frame: velodyne
+
+# Timer
+# if set as a negative value, it means the frame interval for the processing
+# for example -5.0 means conduct the operation per 5 frames
+update_mesh_every_n_sec: 0.2
+update_esdf_every_n_sec: 0.1 # How many seconds per ESDF update(turn on/off the esdf mapping module here (turn off by setting this value to 0))
+publish_map_every_n_sec: 1.0 # How many seconds per TSDF update(turn on/off the esdf mapping module here (turn off by setting this value to 0))
+eval_esdf_every_n_sec: 0.0
+min_time_between_msgs_sec: 0.0 # Min time required between sensor messages
+
+# Visualization
+color_mode: lambert # select from color, normals, height, lambert, lambert_color
+intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, inverse_grayscale, ironbow
+# publishing settings
+publish_traversable: false
+publish_pointclouds: false # Publish all possible pointcloud messages -- surface pointclouds, updated points, and occupied points.
+publish_esdf_map: true
+publish_slices: true
+publish_robot_model: true
+slice_level: 1.0 # z-height of desired TSDF/ESDF slice
+robot_model_scale: 2.5
+# mesh_filename: '/home/vasileiosv/global_sdf_results/saicnyoffice_voxfield.ply'
+
+# Logging
+verbose: false
+timing: true

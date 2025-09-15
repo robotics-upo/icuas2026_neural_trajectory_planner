@@ -1,0 +1,12 @@
+<launch>
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/> 
+
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/velodyne_points"/>
+    <!-- <remap from="transform" to="/kinect/vrpn_client/estimated_transform" /> -->
+    <rosparam file="$(find voxblox_ros)/cfg/calib/replica_calib.yaml"/>  <!-- Sensor extrinsics and intrinsics -->
+    <rosparam file="$(find voxblox_ros)/cfg/param/replica_param.yaml"/>  <!-- Parameters -->
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
+  </node>
+
+</launch>

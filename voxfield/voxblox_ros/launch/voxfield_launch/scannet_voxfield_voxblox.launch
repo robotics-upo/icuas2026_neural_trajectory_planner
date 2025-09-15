@@ -1,0 +1,31 @@
+<launch>
+  <arg name="process_every_nth_frame" default="1" />
+
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/> 
+
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/velodyne_points"/>
+    <!-- <remap from="transform" to="/kinect/vrpn_client/estimated_transform" /> -->
+    <rosparam file="$(find voxblox_ros)/cfg/calib/scannet_calib.yaml"/>  <!-- Sensor extrinsics and intrinsics -->
+    <rosparam file="$(find voxblox_ros)/cfg/param/scannet_param.yaml"/>  <!-- Parameters -->
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
+  </node>
+  
+  <!-- ===================== -->
+  <!-- Custom Voxblox Node (separate namespace to avoid name overlapping) -->
+  <!-- ===================== -->
+  <group ns="exp_voxblox">
+    <node name="voxblox_node" pkg="voxblox_ros" type="voxblox_server" output="screen">
+      <!-- Enable ESDF -->
+      <param name="esdf/enable" value="true"/>
+      <param name="esdf/publish_esdf_map" value="true"/>
+      <param name="esdf/map_frame" value="world"/>
+      <!-- Custom ESDF topic -->
+      <param name="esdf_map_topic" value="/my_voxblox/voxblox_node/esdf_map_out"/>
+      <!-- Adjust resolution or other parameters -->
+      <param name="voxel_size" value="0.1"/>
+      <param name="voxels_per_side" value="16"/>
+    </node>
+  </group>
+
+</launch>

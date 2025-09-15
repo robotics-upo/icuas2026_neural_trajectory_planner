@@ -1,0 +1,4 @@
+geometry_msgs/Point coordinates
+---
+float32 result
+

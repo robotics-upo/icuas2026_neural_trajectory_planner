@@ -1,0 +1,9 @@
+*.ot
+*.gridm
+*.gridmsha
+*.log
+.vscode/
+doc/
+debian/
+build/
+scripts/*.png

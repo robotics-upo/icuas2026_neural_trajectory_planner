@@ -1,0 +1,21 @@
+<launch>
+  <param name="use_sim_time" value="true" />
+  <arg name="play_bag" default="true" />
+  <arg name="speed" default="1.0" />
+  <arg name="process_every_nth_frame" default="1" />
+
+  <arg name="bag_file" default="/home/vasileiosv/bags/saicny_office/office_data.bag"/>
+
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/> 
+
+  <node name="player" pkg="rosbag" type="play" output="screen" args="-r $(arg speed) --clock $(arg bag_file)" if="$(arg play_bag)"/>
+
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/velodyne_points"/>
+    <!-- <remap from="transform" to="/kinect/vrpn_client/estimated_transform" /> -->
+    <rosparam file="$(find voxblox_ros)/cfg/calib/saicnyoffice_calib.yaml"/>  <!-- Sensor extrinsics and intrinsics -->
+    <rosparam file="$(find voxblox_ros)/cfg/param/saicnyoffice_param.yaml"/>  <!-- Parameters -->
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
+  </node>
+
+</launch>

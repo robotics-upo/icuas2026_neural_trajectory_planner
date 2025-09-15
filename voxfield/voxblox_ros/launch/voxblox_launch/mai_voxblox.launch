@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<launch>
+  <param name="use_sim_time" value="true" />
+  <arg name="play_bag" default="true" />
+  <arg name="speed" default="0.25" />
+  <arg name="process_every_nth_frame" default="1" />
+
+  <arg name="bag_file" default="/media/yuepan/SeagateNew/1_data/mai_city/bags/01.bag"/>
+  
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/car.dae"/> 
+
+  <node name="player" pkg="rosbag" type="play" output="screen" args=" -r $(arg speed) --clock $(arg bag_file)"  if="$(arg play_bag)"/>
+  
+  <!-- Run voxblox_node-->
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxblox_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/velodyne_points" />
+    <rosparam file="$(find voxblox_ros)/cfg/param/mai_param.yaml"/>
+    <rosparam file="$(find voxblox_ros)/cfg/calib/mai_calib.yaml"/>
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
+  </node>
+
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/mai_25cm.rviz" />
+</launch>
