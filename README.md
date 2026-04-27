@@ -1,6 +1,6 @@
 Neural ESDF local trajectory planner implementation
 
-This repository contains every package used in the framework presented for ICRA2026 conference. It is an open-source framework that integrates a distance-aware 3D local continuous trajectory planning algorithm based on Euclidean Signed Distance Fields (ESDFs) with an online generated Sinusoidal Representation Neural network (SIREN) to estimate the required ESDF. 
+This repository contains every package used in the framework presented for ICUAS2026 conference. It is an open-source framework that integrates a distance-aware 3D local continuous trajectory planning algorithm based on Euclidean Signed Distance Fields (ESDFs) with an online generated Sinusoidal Representation Neural network (SIREN) to estimate the required ESDF. 
 
 # **Installation**
 
