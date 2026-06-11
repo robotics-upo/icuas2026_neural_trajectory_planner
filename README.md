@@ -24,6 +24,6 @@ Pending publication
 
 # **Acknowledgement**
 
-![Logo Ministerio de Ciencia e Innovación, Fondos NextGenerationEU, PRTR, Agencia Estatal de Investigación](./acknowledgement_logos.png)
+![Logo Ministerio de Ciencia e Innovación, Fondos NextGenerationEU, PRTR, Agencia Estatal de Investigación](./acknowledgement_logos_icuas26.pdf)
 
 This work was supported by the grants COBUILD (PID2024-161069OB-C31, funded by the Ministry of Science, Innovation and Universities, the Spanish Research Agency, and the European Regional Development Fund, MICIU /AEI /10.13039/501100011033 / FEDER, UE), and PICRAH 4.0 (PLEC2023-010353, funded by the Spanish Research Agency and the Ministry of Science, Innovation and Universities, MCIN /AEI /10.13039/501100011033)
